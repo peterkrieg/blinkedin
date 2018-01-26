@@ -25,7 +25,12 @@ class JobModal extends React.PureComponent {
     super(props);
 
     const { job } = props.modal;
-    const initialState = job ? { ...job } : {};
+    const initialState = job ? { ...job } : {
+      title: '',
+      company: '',
+      salary: 0,
+      notes: '',
+    };
 
     this.state = {
       isOpen: false,
@@ -76,7 +81,7 @@ class JobModal extends React.PureComponent {
           company,
           salary,
           notes,
-          uid: this.props.auth.id,
+          uid: this.props.auth.uid,
         }).then((res) => {
           this.setState({
             status: 'success',
@@ -84,7 +89,6 @@ class JobModal extends React.PureComponent {
           });
           this.props.hideModal({ status: 'success' });
         }).catch((err) => {
-          console.log(err);
           this.setState({
             status: 'error',
             submitted: true,
@@ -105,7 +109,6 @@ class JobModal extends React.PureComponent {
           });
           this.props.hideModal({ status: 'success' });
         }).catch((err) => {
-          console.log(err);
           this.setState({
             status: 'error',
             message: err.errorMessage,
@@ -159,7 +162,7 @@ class JobModal extends React.PureComponent {
             name="title"
             placeholder="your job title here..."
             value={title}
-            valid={title !== '' || !submitted}
+            valid={title.length !== 0 || !submitted}
             onChange={this.handleInputChange}
           />
           <Input
@@ -168,7 +171,7 @@ class JobModal extends React.PureComponent {
             name="company"
             placeholder="your company name here..."
             value={company}
-            valid={company !== '' || !submitted}
+            valid={company.length !== 0 || !submitted}
             onChange={this.handleInputChange}
           />
           <Input
@@ -185,7 +188,7 @@ class JobModal extends React.PureComponent {
             name="notes"
             placeholder="your job description here..."
             value={notes}
-            valid={notes !== '' || !submitted}
+            valid={notes.length !== 0 || !submitted}
             onChange={this.handleInputChange}
           />
         </ModalBody>
@@ -193,7 +196,7 @@ class JobModal extends React.PureComponent {
           <Button
             color="primary"
             onClick={this.onSave}
-            disabled={status === 'saving'}
+            disabled={status === 'saving' || title.length === 0 || company.length === 0 || salary <= 0 || notes.length === 0}
           >
             Save
           </Button>

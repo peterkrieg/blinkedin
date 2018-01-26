@@ -1,8 +1,17 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import { persistStore } from 'redux-persist';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
 import rootReducer from '../reducers';
+
+const config = {
+  key: 'root',
+  storage,
+  blacklist: [],
+};
+
+const persistedReducer = persistReducer(config, rootReducer);
 
 const configureStore = () => {
   const middlewares = [thunk];
@@ -11,17 +20,12 @@ const configureStore = () => {
   const enhancer = compose(applyMiddleware(...middlewares));
 
   //  Create Store
-  const store = createStore(rootReducer, {}, enhancer);
+  const store = createStore(persistedReducer, {}, enhancer);
 
   //  Persist Store
-  try {
-    persistStore(store);
-    console.log('persistStore Succeed');
-  } catch (e) {
-    console.log('persistStore Failed: ', e);
-  }
+  const persistor = persistStore(store);
 
-  return store;
+  return { store, persistor };
 };
 
 export default configureStore;

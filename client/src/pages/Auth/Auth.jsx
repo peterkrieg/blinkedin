@@ -52,7 +52,7 @@ class Auth extends Component {
         if (res.data.success) {
           this.props.updateAuthState({
             isAuthorised: true,
-            id: res.data.id,
+            uid: res.data.id,
           });
           this.props.history.push('/jobs');
         } else {
@@ -62,7 +62,6 @@ class Auth extends Component {
           });
         }
       }).catch((err) => {
-        console.log(err);
         this.setState({
           status: 'error',
           message: err.errorMessage,
@@ -196,12 +195,8 @@ class Auth extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  auth: state.auth,
-});
-
 const mapDispatchToProps = dispatch => bindActionCreators({
   updateAuthState,
 }, dispatch);
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Auth));
+export default withRouter(connect(null, mapDispatchToProps)(Auth));

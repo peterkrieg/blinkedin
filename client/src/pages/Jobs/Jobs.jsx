@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Container, Card, CardTitle, CardSubtitle, CardText, Button, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import PropTypes from 'prop-types';
+
+import { Container, Card, CardTitle, CardSubtitle, CardText, Button, CardHeader, CardBody, Row, Col } from 'reactstrap';
+import swal from 'sweetalert2';
 
 import Nav from '../../components/Nav';
 import JobModal from '../../modals/Job';
@@ -40,6 +42,29 @@ class Jobs extends Component {
     this.props.showModal({ type: 'editJob', job });
   }
 
+  onRemove = (job) => {
+    swal({
+      title: 'You really want to remove this Job?',
+      text: `We are going to remove "${job.title}" and this can't be undone. You sure about this?`,
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Remove',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.value) {
+        API.deleteJob(job._id)
+          .then((res) => {
+            this.loadJobs();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    });
+  }
+
   loadJobs = () => {
     API.getJobs()
       .then((res) => {
@@ -58,7 +83,7 @@ class Jobs extends Component {
 
   render() {
     const { jobs, status, message } = this.state;
-    const { id } = this.props.auth;
+    const { uid } = this.props.auth;
 
     return (
       <div className="full-content">
@@ -80,7 +105,7 @@ class Jobs extends Component {
                       <CardSubtitle>{job.company}</CardSubtitle>
                     </Col>
                     {
-                      job.uid === id &&
+                      job.uid === uid &&
                       <Col className="ml-auto">
                         <Row className="h-100 justify-content-end align-items-center">
                           <Button
@@ -94,7 +119,7 @@ class Jobs extends Component {
                           <Button
                             className="mx-2"
                             color="danger"
-                            onClick={this.onRemove}
+                            onClick={() => this.onRemove(job)}
                             disabled={status === 'saving'}
                           >
                             Remove
